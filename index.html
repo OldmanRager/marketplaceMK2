@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - Buy & Sell Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f3460, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Glass morphism panels */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d4ff, #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+            animation: pulse 3s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #0066ff);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0066ff);
+            color: white;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Main content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Listings grid */
+        .listings-section {
+            margin-top: 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #fff, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .listing-card {
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .listing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .listing-card:hover::before {
+            animation: shimmer 0.6s ease;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .listing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+        }
+
+        .listing-media {
+            width: 100%;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .listing-media img, .listing-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .listing-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .listing-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .listing-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* User dashboard */
+        .dashboard {
+            display: none;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff, #0066ff);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #888;
+        }
+
+        /* Credits modal */
+        .credits-packages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .package-card {
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .package-card:hover {
+            transform: scale(1.05);
+            border-color: #00d4ff;
+        }
+
+        .package-card.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .package-credits {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .package-price {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Floating action button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00d4ff, #0066ff);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .fab:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.6);
+        }
+
+        /* Rating and Reviews */
+        .rating-stars {
+            display: inline-flex;
+            gap: 0.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .star {
+            font-size: 1.2rem;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .star.filled {
+            color: #ffd700;
+            transform: scale(1.1);
+        }
+
+        .star:hover {
+            color: #ffd700;
+            transform: scale(1.2);
+        }
+
+        .rating-summary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .rating-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .rating-count {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .review-section {
+            margin-top: 2rem;
+            padding: 2rem;
+        }
+
+        .review-form {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .review-item {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .review-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .review-item.flagged {
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .reviewer-name {
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .review-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .review-text {
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        .seller-response {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 3px solid #00d4ff;
+            border-radius: 5px;
+        }
+
+        .seller-response-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .response-form {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-respond {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-respond:hover {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-flag {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-flag:hover {
+            background: rgba(255, 107, 107, 0.3);
+        }
+
+        .moderation-badge {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Review moderation section */
+        .moderation-section {
+            margin-top: 2rem;
+            padding: 2rem;
+        }
+
+        .moderation-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-btn.active {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            color: #00d4ff;
+        }
+
+        .moderation-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .mod-stat-card {
+            padding: 1.5rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .mod-stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .mod-stat-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .seller-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 0.5rem;
+        }
+
+        .seller-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            color: #ffd700;
+        }
+
+        /* User profile in listings */
+        .listing-seller {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .seller-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .seller-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00d4ff, #0066ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        /* Listing detail modal */
+        .listing-detail-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .detail-media {
+            width: 100%;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .detail-media img, .detail-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Ad Banners */
+        .ad-banner {
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .ad-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .ad-banner:hover::before {
+            left: 100%;
+        }
+
+        .ad-banner:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .ad-banner h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #ff6b6b, #ff9500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ad-banner p {
+            color: #b0b0b0;
+            font-size: 1.1rem;
+        }
+
+        .ad-label {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .admin-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .admin-section {
+            padding: 1.5rem;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 1rem;
+            color: #ff6b6b;
+        }
+
+        .admin-stats {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .admin-stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-badge {
+            background: linear-gradient(45deg, #ff6b6b, #ff9500);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .user-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            border-radius: 20px;
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ff9500;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .listings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ad-banner h3 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">Marketplace</div>
+            <div class="nav-links">
+                <a href="#" class="nav-link" onclick="showHome()">Browse</a>
+                <a href="#" class="nav-link" id="dashboardLink" style="display: none;" onclick="showDashboard()">Dashboard</a>
+                <a href="#" class="nav-link" id="adminLink" style="display: none;" onclick="showAdminPanel()">Admin</a>
+                <button class="btn btn-primary" id="authBtn" onclick="showAuthModal()">Sign In</button>
+                <button class="btn btn-primary" id="userBtn" style="display: none;" onclick="showUserMenu()">
+                    <span id="userEmail"></span>
+                    <span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span>
+                </button>
+                <div class="admin-section glass">
+                    <h3>Review Moderation</h3>
+                    <div class="admin-stats">
+                        <div class="admin-stat-item">
+                            <span>Total Reviews</span>
+                            <span id="totalReviews">0</span>
+                        </div>
+                        <div class="admin-stat-item">
+                            <span>Flagged Reviews</span>
+                            <span id="flaggedReviews" style="color: #ff6b6b;">0</span>
+                        </div>
+                        <div class="admin-stat-item">
+                            <span>Pending Moderation</span>
+                            <span id="pendingModeration" style="color: #ff9500;">0</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="showModerationPanel()" style="margin-top: 1rem;">
+                        Manage Reviews
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero" id="heroSection">
+            <h1>Buy & Sell Anything</h1>
+            <p>Join thousands of sellers and buyers in our vibrant marketplace</p>
+        </div>
+
+        <!-- Top Ad Banner -->
+        <div class="ad-banner glass" id="topAdBanner" onclick="handleAdClick('top')">
+            <span class="ad-label">Sponsored</span>
+            <h3>Summer Sale - Up to 50% Off!</h3>
+            <p>Check out our premium electronics collection with exclusive deals</p>
+        </div>
+
+        <!-- Listings Section -->
+        <div class="listings-section" id="listingsSection">
+            <div class="section-header">
+                <h2 class="section-title">Latest Listings</h2>
+                <button class="btn btn-primary" id="postBtn" style="display: none;" onclick="showPostModal()">
+                    + Post Item
+                </button>
+            </div>
+            <div class="listings-grid" id="listingsGrid">
+                <!-- Listings will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Bottom Ad Banner -->
+        <div class="ad-banner glass" id="bottomAdBanner" onclick="handleAdClick('bottom')">
+            <span class="ad-label">Sponsored</span>
+            <h3>Become a Power Seller Today!</h3>
+            <p>Get unlimited posts and premium features with our Pro membership</p>
+        </div>
+
+        <!-- User Dashboard -->
+        <div class="dashboard glass" id="dashboard">
+            <h2 class="section-title">My Dashboard</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card glass">
+                    <div class="stat-value" id="freePostsCount">5</div>
+                    <div class="stat-label">Free Posts Remaining</div>
+                </div>
+                <div class="stat-card glass">
+                    <div class="stat-value" id="creditsCount">0</div>
+                    <div class="stat-label">Credits Available</div>
+                </div>
+                <div class="stat-card glass">
+                    <div class="stat-value" id="activeListingsCount">0</div>
+                    <div class="stat-label">Active Listings</div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h3>My Listings</h3>
+                <button class="btn btn-primary" onclick="showCreditsModal()">Buy Credits</button>
+            </div>
+            
+            <div class="listings-grid" id="userListings">
+                <!-- User's listings will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel glass" id="adminPanel">
+            <h2 class="section-title">Admin Control Panel</h2>
+            
+            <div class="admin-controls">
+                <div class="admin-section glass">
+                    <h3>Platform Statistics</h3>
+                    <div class="admin-stats">
+                        <div class="admin-stat-item">
+                            <span>Total Users</span>
+                            <span id="totalUsers">0</span>
+                        </div>
+                        <div class="admin-stat-item">
+                            <span>Total Listings</span>
+                            <span id="totalListings">0</span>
+                        </div>
+                        <div class="admin-stat-item">
+                            <span>Active Ads</span>
+                            <span>2</span>
+                        </div>
+                        <div class="admin-stat-item">
+                            <span>Revenue (Demo)</span>
+                            <span>$1,234.56</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section glass">
+                    <h3>Ad Management</h3>
+                    <div class="form-group">
+                        <label>Top Banner</label>
+                        <input type="text" id="topAdTitle" value="Summer Sale - Up to 50% Off!" onchange="updateAd('top')">
+                        <input type="text" id="topAdDesc" value="Check out our premium electronics collection with exclusive deals" onchange="updateAd('top')" style="margin-top: 0.5rem;">
+                    </div>
+                    <div class="form-group">
+                        <label>Bottom Banner</label>
+                        <input type="text" id="bottomAdTitle" value="Become a Power Seller Today!" onchange="updateAd('bottom')">
+                        <input type="text" id="bottomAdDesc" value="Get unlimited posts and premium features with our Pro membership" onchange="updateAd('bottom')" style="margin-top: 0.5rem;">
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-section glass" style="margin-top: 2rem;">
+                <h3>User Management</h3>
+                <div class="user-list" id="userList">
+                    <!-- Users will be listed here -->
+                </div>
+            </div>
+
+            <div class="admin-section glass" style="margin-top: 2rem;">
+                <h3>All Listings</h3>
+                <div class="listings-grid" id="adminListings">
+                    <!-- All listings displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Moderation Modal -->
+    <div class="modal" id="moderationModal">
+        <div class="modal-content glass" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="closeModal('moderationModal')">&times;</span>
+            <h2>Review Moderation Panel</h2>
+            
+            <div class="moderation-stats">
+                <div class="mod-stat-card">
+                    <div class="mod-stat-value" id="modTotalReviews">0</div>
+                    <div class="mod-stat-label">Total Reviews</div>
+                </div>
+                <div class="mod-stat-card">
+                    <div class="mod-stat-value" id="modFlaggedReviews" style="color: #ff6b6b;">0</div>
+                    <div class="mod-stat-label">Flagged</div>
+                </div>
+                <div class="mod-stat-card">
+                    <div class="mod-stat-value" id="modApprovedReviews" style="color: #4caf50;">0</div>
+                    <div class="mod-stat-label">Approved</div>
+                </div>
+            </div>
+            
+            <div class="moderation-filters">
+                <button class="filter-btn active" onclick="filterReviews('all')">All Reviews</button>
+                <button class="filter-btn" onclick="filterReviews('flagged')">Flagged Only</button>
+                <button class="filter-btn" onclick="filterReviews('pending')">Pending</button>
+                <button class="filter-btn" onclick="filterReviews('approved')">Approved</button>
+            </div>
+            
+            <div id="moderationReviewsList">
+                <!-- Reviews will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="fab" style="display: none;" onclick="showPostModal()">+</button>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeModal('authModal')">&times;</span>
+            <h2 id="authTitle">Sign In</h2>
+            
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="authEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <span id="authSubmitText">Sign In</span>
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 1rem;">
+                <span id="authToggleText">Don't have an account?</span>
+                <a href="#" onclick="toggleAuthMode()" style="color: #00d4ff;">
+                    <span id="authToggleLink">Sign Up</span>
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Post Item Modal -->
+    <div class="modal" id="postModal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeModal('postModal')">&times;</span>
+            <h2>Post New Item</h2>
+            
+            <form id="postForm" onsubmit="handlePost(event)">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="itemTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" id="itemPrice" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="itemCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="electronics">Electronics</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="home">Home & Garden</option>
+                        <option value="vehicles">Vehicles</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="itemDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Images (Demo: Enter image URLs)</label>
+                    <input type="text" id="itemImages" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label>Video (Demo: Enter video URL)</label>
+                    <input type="text" id="itemVideo" placeholder="https://example.com/video.mp4">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Post Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Listing Detail Modal -->
+    <div class="modal" id="listingModal">
+        <div class="modal-content glass listing-detail-content">
+            <span class="close" onclick="closeModal('listingModal')">&times;</span>
+            <div id="listingDetailContent">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Credits Modal -->
+    <div class="modal" id="creditsModal">
+        <div class="modal-content glass">
+            <span class="close" onclick="closeModal('creditsModal')">&times;</span>
+            <h2>Buy Credits</h2>
+            <p style="color: #888; margin-bottom: 1rem;">Select a credit package to continue posting after your free posts</p>
+            
+            <div class="credits-packages">
+                <div class="package-card glass" onclick="selectPackage(this, 10, 5)">
+                    <div class="package-credits">10</div>
+                    <div class="package-price">$5</div>
+                    <div style="color: #888; font-size: 0.9rem;">$0.50 per post</div>
+                </div>
+                <div class="package-card glass" onclick="selectPackage(this, 25, 10)">
+                    <div class="package-credits">25</div>
+                    <div class="package-price">$10</div>
+                    <div style="color: #888; font-size: 0.9rem;">$0.40 per post</div>
+                </div>
+                <div class="package-card glass" onclick="selectPackage(this, 60, 20)">
+                    <div class="package-credits">60</div>
+                    <div class="package-price">$20</div>
+                    <div style="color: #888; font-size: 0.9rem;">$0.33 per post</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; margin-top: 2rem;" onclick="purchaseCredits()">
+                Purchase Credits
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let currentUser = null;
+        let selectedPackage = null;
+        let isSignUp = false;
+
+        // Mock database
+        const users = {
+            'admin@marketplace.com': {
+                email: 'admin@marketplace.com',
+                password: 'admin123',
+                isAdmin: true,
+                freePosts: 999,
+                credits: 999,
+                listings: [],
+                rating: 0,
+                reviewCount: 0
+            }
+        };
+        const listings = [];
+        const reviews = {}; // Store reviews by listing ID
+        let currentReviewFilter = 'all';
+        const ads = {
+            top: {
+                title: 'Summer Sale - Up to 50% Off!',
+                description: 'Check out our premium electronics collection with exclusive deals',
+                clicks: 0
+            },
+            bottom: {
+                title: 'Become a Power Seller Today!',
+                description: 'Get unlimited posts and premium features with our Pro membership',
+                clicks: 0
+            }
+        };
+
+        // Initialize
+        window.onload = function() {
+            renderListings();
+            
+            // Add scroll effect to navbar
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        };
+
+        // Auth functions
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'block';
+        }
+
+        function toggleAuthMode() {
+            isSignUp = !isSignUp;
+            document.getElementById('authTitle').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+            document.getElementById('authSubmitText').textContent = isSignUp ? 'Sign Up' : 'Sign In';
+            document.getElementById('authToggleText').textContent = isSignUp ? 'Already have an account?' : "Don't have an account?";
+            document.getElementById('authToggleLink').textContent = isSignUp ? 'Sign In' : 'Sign Up';
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+
+            if (isSignUp) {
+                // Sign up
+                if (users[email]) {
+                    alert('User already exists!');
+                    return;
+                }
+                users[email] = {
+                    email,
+                    password,
+                    isAdmin: false,
+                    freePosts: 5,
+                    credits: 0,
+                    listings: [],
+                    rating: 0,
+                    reviewCount: 0
+                };
+                currentUser = users[email];
+            } else {
+                // Sign in
+                if (!users[email] || users[email].password !== password) {
+                    alert('Invalid credentials!');
+                    return;
+                }
+                currentUser = users[email];
+            }
+
+            updateUI();
+            closeModal('authModal');
+            document.getElementById('authForm').reset();
+        }
+
+        function updateUI() {
+            if (currentUser) {
+                document.getElementById('authBtn').style.display = 'none';
+                document.getElementById('userBtn').style.display = 'block';
+                document.getElementById('userEmail').textContent = currentUser.email;
+                document.getElementById('dashboardLink').style.display = 'block';
+                document.getElementById('postBtn').style.display = 'block';
+                document.getElementById('fab').style.display = 'flex';
+                
+                // Show admin features if admin
+                if (currentUser.isAdmin) {
+                    document.getElementById('adminLink').style.display = 'block';
+                    document.getElementById('adminBadge').style.display = 'inline-block';
+                    updateAdminStats();
+                } else {
+                    document.getElementById('adminLink').style.display = 'none';
+                    document.getElementById('adminBadge').style.display = 'none';
+                }
+                
+                // Update dashboard stats
+                document.getElementById('freePostsCount').textContent = currentUser.freePosts;
+                document.getElementById('creditsCount').textContent = currentUser.credits;
+                document.getElementById('activeListingsCount').textContent = currentUser.listings.length;
+                
+                renderUserListings();
+            } else {
+                document.getElementById('authBtn').style.display = 'block';
+                document.getElementById('userBtn').style.display = 'none';
+                document.getElementById('dashboardLink').style.display = 'none';
+                document.getElementById('postBtn').style.display = 'none';
+                document.getElementById('fab').style.display = 'none';
+                document.getElementById('adminLink').style.display = 'none';
+            }
+        }
+
+        function showUserMenu() {
+            if (confirm('Sign out?')) {
+                currentUser = null;
+                updateUI();
+                showHome();
+            }
+        }
+
+        // Navigation
+        function showHome() {
+            document.getElementById('heroSection').style.display = 'block';
+            document.getElementById('listingsSection').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('topAdBanner').style.display = 'block';
+            document.getElementById('bottomAdBanner').style.display = 'block';
+        }
+
+        function showDashboard() {
+            document.getElementById('heroSection').style.display = 'none';
+            document.getElementById('listingsSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('topAdBanner').style.display = 'none';
+            document.getElementById('bottomAdBanner').style.display = 'none';
+        }
+
+        function showAdminPanel() {
+            if (!currentUser || !currentUser.isAdmin) {
+                alert('Unauthorized access');
+                return;
+            }
+            document.getElementById('heroSection').style.display = 'none';
+            document.getElementById('listingsSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('topAdBanner').style.display = 'none';
+            document.getElementById('bottomAdBanner').style.display = 'none';
+            updateAdminStats();
+            renderAllListingsForAdmin();
+            renderUserList();
+        }
+
+        // Posting
+        function showPostModal() {
+            if (!currentUser) {
+                showAuthModal();
+                return;
+            }
+            
+            if (currentUser.freePosts === 0 && currentUser.credits === 0) {
+                if (confirm('You have no free posts or credits remaining. Would you like to purchase credits?')) {
+                    showCreditsModal();
+                }
+                return;
+            }
+            
+            document.getElementById('postModal').style.display = 'block';
+        }
+
+        function handlePost(e) {
+            e.preventDefault();
+            
+            const listing = {
+                id: Date.now(),
+                userId: currentUser.email,
+                title: document.getElementById('itemTitle').value,
+                price: parseFloat(document.getElementById('itemPrice').value),
+                category: document.getElementById('itemCategory').value,
+                description: document.getElementById('itemDescription').value,
+                images: document.getElementById('itemImages').value,
+                video: document.getElementById('itemVideo').value,
+                date: new Date().toLocaleDateString()
+            };
+            
+            // Deduct post cost
+            if (currentUser.freePosts > 0) {
+                currentUser.freePosts--;
+            } else {
+                currentUser.credits--;
+            }
+            
+            listings.unshift(listing);
+            currentUser.listings.push(listing.id);
+            
+            updateUI();
+            renderListings();
+            closeModal('postModal');
+            document.getElementById('postForm').reset();
+            
+            alert('Item posted successfully!');
+        }
+
+        // Credits
+        function showCreditsModal() {
+            document.getElementById('creditsModal').style.display = 'block';
+        }
+
+        function selectPackage(element, credits, price) {
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedPackage = { credits, price };
+        }
+
+        function purchaseCredits() {
+            if (!selectedPackage) {
+                alert('Please select a package');
+                return;
+            }
+            
+            // In a real app, this would process payment
+            currentUser.credits += selectedPackage.credits;
+            updateUI();
+            closeModal('creditsModal');
+            alert(`Successfully purchased ${selectedPackage.credits} credits!`);
+            selectedPackage = null;
+        }
+
+        // Listings
+        function renderListings() {
+            const grid = document.getElementById('listingsGrid');
+            grid.innerHTML = '';
+            
+            if (listings.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No listings yet. Be the first to post!</p>';
+                return;
+            }
+            
+            listings.forEach(listing => {
+                const card = createListingCard(listing);
+                grid.appendChild(card);
+            });
+        }
+
+        function renderUserListings() {
+            const grid = document.getElementById('userListings');
+            grid.innerHTML = '';
+            
+            const userListings = listings.filter(l => currentUser.listings.includes(l.id));
+            
+            if (userListings.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">You haven\'t posted any items yet.</p>';
+                return;
+            }
+            
+            userListings.forEach(listing => {
+                const card = createListingCard(listing);
+                grid.appendChild(card);
+            });
+        }
+
+        function createListingCard(listing) {
+            const card = document.createElement('div');
+            card.className = 'listing-card glass';
+            
+            let mediaContent = '<div class="listing-media">No media</div>';
+            if (listing.images) {
+                mediaContent = `<div class="listing-media"><img src="${listing.images}" alt="${listing.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%23333\'/%3E%3Ctext x=\'50\' y=\'50\' text-anchor=\'middle\' dy=\'.3em\' fill=\'%23666\'%3ENo Image%3C/text%3E%3C/svg%3E'"></div>`;
+            } else if (listing.video) {
+                mediaContent = `<div class="listing-media"><video src="${listing.video}" controls></video></div>`;
+            }
+            
+            card.innerHTML = `
+                ${mediaContent}
+                <h3 class="listing-title">${listing.title}</h3>
+                <div class="listing-price">${listing.price.toFixed(2)}</div>
+                <p style="color: #888; margin-bottom: 1rem;">${listing.description.substring(0, 100)}${listing.description.length > 100 ? '...' : ''}</p>
+                <div class="listing-meta">
+                    <span>${listing.category}</span>
+                    <span>${listing.date}</span>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Admin functions
+        function updateAdminStats() {
+            document.getElementById('totalUsers').textContent = Object.keys(users).length;
+            document.getElementById('totalListings').textContent = listings.length;
+            
+            // Count reviews
+            let totalReviews = 0;
+            let flaggedReviews = 0;
+            Object.values(reviews).forEach(listingReviews => {
+                totalReviews += listingReviews.length;
+                flaggedReviews += listingReviews.filter(r => r.flagged).length;
+            });
+            
+            document.getElementById('totalReviews').textContent = totalReviews;
+            document.getElementById('flaggedReviews').textContent = flaggedReviews;
+            document.getElementById('pendingModeration').textContent = flaggedReviews;
+        }
+
+        function renderUserList() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            Object.values(users).forEach(user => {
+                if (user.email === currentUser.email) return; // Don't show current admin
+                
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div>
+                        <strong>${user.email}</strong>
+                        ${user.isAdmin ? '<span class="admin-badge">ADMIN</span>' : ''}
+                        <br>
+                        <small>Posts: ${user.listings.length} | Credits: ${user.credits} | Rating: ${user.rating > 0 ? user.rating.toFixed(1) + ' ★' : 'No ratings'}</small>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn btn-small btn-warning" onclick="viewUserListings('${user.email}')">View</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteUser('${user.email}')">Delete</button>
+                    </div>
+                `;
+                userList.appendChild(userItem);
+            });
+        }
+
+        function renderAllListingsForAdmin() {
+            const grid = document.getElementById('adminListings');
+            grid.innerHTML = '';
+            
+            if (listings.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #888; grid-column: 1/-1;">No listings in the platform yet.</p>';
+                return;
+            }
+            
+            listings.forEach(listing => {
+                const card = createListingCard(listing);
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-small btn-danger';
+                deleteBtn.style.marginTop = '1rem';
+                deleteBtn.textContent = 'Delete Listing';
+                deleteBtn.onclick = () => deleteListing(listing.id);
+                card.appendChild(deleteBtn);
+                grid.appendChild(card);
+            });
+        }
+
+        function viewUserListings(email) {
+            const user = users[email];
+            if (!user) return;
+            
+            const userListings = listings.filter(l => user.listings.includes(l.id));
+            alert(`${email} has ${userListings.length} listing(s):\n\n${userListings.map(l => `- ${l.title} (${l.price})`).join('\n')}`);
+        }
+
+        function deleteUser(email) {
+            if (!confirm(`Are you sure you want to delete user ${email}?`)) return;
+            
+            // Remove user's listings
+            const user = users[email];
+            if (user) {
+                user.listings.forEach(listingId => {
+                    const index = listings.findIndex(l => l.id === listingId);
+                    if (index > -1) listings.splice(index, 1);
+                });
+            }
+            
+            delete users[email];
+            renderUserList();
+            updateAdminStats();
+            renderAllListingsForAdmin();
+            alert('User deleted successfully');
+        }
+
+        function deleteListing(listingId) {
+            if (!confirm('Are you sure you want to delete this listing?')) return;
+            
+            const index = listings.findIndex(l => l.id === listingId);
+            if (index > -1) {
+                const listing = listings[index];
+                
+                // Remove from user's listings
+                Object.values(users).forEach(user => {
+                    const userListingIndex = user.listings.indexOf(listingId);
+                    if (userListingIndex > -1) {
+                        user.listings.splice(userListingIndex, 1);
+                    }
+                });
+                
+                listings.splice(index, 1);
+                renderAllListingsForAdmin();
+                renderListings();
+                updateAdminStats();
+                alert('Listing deleted successfully');
+            }
+        }
+
+        // Ad functions
+        function handleAdClick(position) {
+            ads[position].clicks++;
+            alert(`Ad clicked! Total clicks: ${ads[position].clicks}`);
+        }
+
+        function updateAd(position) {
+            const titleInput = document.getElementById(`${position}AdTitle`);
+            const descInput = document.getElementById(`${position}AdDesc`);
+            
+            ads[position].title = titleInput.value;
+            ads[position].description = descInput.value;
+            
+            const banner = document.getElementById(`${position}AdBanner`);
+            banner.querySelector('h3').textContent = titleInput.value;
+            banner.querySelector('p').textContent = descInput.value;
+            
+            alert('Ad updated successfully!');
+        }
+
+        // Modal functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Demo data
+        setTimeout(() => {
+            // Add some demo listings
+            const demoListings = [
+                {
+                    id: 1,
+                    userId: 'demo@example.com',
+                    title: 'Premium Wireless Headphones',
+                    price: 149.99,
+                    category: 'electronics',
+                    description: 'High-quality wireless headphones with noise cancellation and 30-hour battery life.',
+                    images: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300',
+                    video: '',
+                    date: new Date().toLocaleDateString()
+                },
+                {
+                    id: 2,
+                    userId: 'demo@example.com',
+                    title: 'Vintage Leather Jacket',
+                    price: 89.99,
+                    category: 'fashion',
+                    description: 'Classic brown leather jacket in excellent condition. Size M.',
+                    images: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300',
+                    video: '',
+                    date: new Date().toLocaleDateString()
+                },
+                {
+                    id: 3,
+                    userId: 'demo@example.com',
+                    title: 'Modern Standing Desk',
+                    price: 299.99,
+                    category: 'home',
+                    description: 'Adjustable height electric standing desk with memory settings.',
+                    images: 'https://images.unsplash.com/photo-1555212697-194d092e3b8f?w=300',
+                    video: '',
+                    date: new Date().toLocaleDateString()
+                }
+            ];
+            
+            // Create demo user
+            users['demo@example.com'] = {
+                email: 'demo@example.com',
+                password: 'demo123',
+                isAdmin: false,
+                freePosts: 2,
+                credits: 15,
+                listings: [1, 2, 3, 4],
+                rating: 4.5,
+                reviewCount: 3
+            };
+            
+            // Add some demo reviews
+            reviews[1] = [
+                {
+                    id: 101,
+                    listingId: 1,
+                    reviewerEmail: 'buyer1@example.com',
+                    rating: 5,
+                    text: 'Excellent headphones! Great sound quality and fast shipping.',
+                    date: '7/3/2025',
+                    flagged: false,
+                    status: 'approved',
+                    sellerResponse: 'Thank you for your purchase! Glad you love the headphones!',
+                    responseDate: '7/4/2025'
+                },
+                {
+                    id: 102,
+                    listingId: 1,
+                    reviewerEmail: 'buyer2@example.com',
+                    rating: 4,
+                    text: 'Good product, works as described. Seller was responsive.',
+                    date: '7/2/2025',
+                    flagged: false,
+                    status: 'approved',
+                    sellerResponse: null,
+                    responseDate: null
+                }
+            ];
+            
+            reviews[2] = [
+                {
+                    id: 103,
+                    listingId: 2,
+                    reviewerEmail: 'buyer3@example.com',
+                    rating: 4,
+                    text: 'Beautiful jacket! Exactly as pictured. Would buy again.',
+                    date: '7/1/2025',
+                    flagged: true,
+                    status: 'pending',
+                    sellerResponse: null,
+                    responseDate: null
+                }
+            ];
+            
+            // Add a problematic review to show moderation
+            reviews[3] = [
+                {
+                    id: 104,
+                    listingId: 3,
+                    reviewerEmail: 'angry_buyer@example.com',
+                    rating: 1,
+                    text: 'This is a fake review with inappropriate content that should be flagged!',
+                    date: '7/5/2025',
+                    flagged: true,
+                    status: 'pending',
+                    sellerResponse: null,
+                    responseDate: null
+                }
+            ];
+            
+            listings.push(...demoListings);
+            renderListings();
+        }, 1000);
+    </script>
+</body>
+</html>
