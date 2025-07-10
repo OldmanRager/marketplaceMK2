@@ -966,9 +966,6 @@
                             <span id="pendingModeration" style="color: #ff9500;">0</span>
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="showModerationPanel()" style="margin-top: 1rem;">
-                        Manage Reviews
-                    </button>
                 </div>
             </div>
         </div>
@@ -1084,6 +1081,36 @@
                 <h3>User Management</h3>
                 <div class="user-list" id="userList">
                     <!-- Users will be listed here -->
+                </div>
+            </div>
+
+            <div class="admin-section glass" style="margin-top: 2rem;">
+                <h3>Review Moderation</h3>
+                
+                <div class="moderation-stats">
+                    <div class="mod-stat-card">
+                        <div class="mod-stat-value" id="modTotalReviews">0</div>
+                        <div class="mod-stat-label">Total Reviews</div>
+                    </div>
+                    <div class="mod-stat-card">
+                        <div class="mod-stat-value" id="modFlaggedReviews" style="color: #ff6b6b;">0</div>
+                        <div class="mod-stat-label">Flagged</div>
+                    </div>
+                    <div class="mod-stat-card">
+                        <div class="mod-stat-value" id="modApprovedReviews" style="color: #4caf50;">0</div>
+                        <div class="mod-stat-label">Approved</div>
+                    </div>
+                </div>
+                
+                <div class="moderation-filters">
+                    <button class="filter-btn active" onclick="filterReviews('all')">All Reviews</button>
+                    <button class="filter-btn" onclick="filterReviews('flagged')">Flagged Only</button>
+                    <button class="filter-btn" onclick="filterReviews('pending')">Pending</button>
+                    <button class="filter-btn" onclick="filterReviews('approved')">Approved</button>
+                </div>
+                
+                <div id="moderationReviewsList" style="margin-top: 1rem;">
+                    <!-- Reviews will be displayed here -->
                 </div>
             </div>
 
@@ -1419,6 +1446,8 @@
             document.getElementById('topAdBanner').style.display = 'none';
             document.getElementById('bottomAdBanner').style.display = 'none';
             updateAdminStats();
+            updateModerationStats();
+            renderModerationReviews();
             renderAllListingsForAdmin();
             renderUserList();
         }
